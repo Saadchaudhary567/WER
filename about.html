@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About &amp; Contact — Kitchzen</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<section class="about-hero">
+  <div class="wrap">
+    <p class="eyebrow">About Kitchzen</p>
+    <h1>We make the kitchen<br>a quieter room.</h1>
+    <p class="lede">Kitchzen started with a simple complaint: most kitchen tools are designed to be noticed, not used. We make the opposite kind — cookware, utensils, storage, and small appliances built to disappear into a calm routine, and to last long enough that you stop thinking about replacing them.</p>
+
+    <div class="value-grid">
+      <div class="value-card">
+        <span class="num">01</span>
+        <h3>Made to last</h3>
+        <p>Cast iron, olive wood, borosilicate glass — materials chosen for a decade of daily use, not a season of good photos.</p>
+      </div>
+      <div class="value-card">
+        <span class="num">02</span>
+        <h3>Few, good things</h3>
+        <p>We'd rather sell you one skillet you keep for years than five you replace every winter. The catalog stays small on purpose.</p>
+      </div>
+      <div class="value-card">
+        <span class="num">03</span>
+        <h3>A calmer counter</h3>
+        <p>Every piece is designed to sit quietly on open shelving — no branding shouting back at you while you cook.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-info">
+      <p class="eyebrow">Contact</p>
+      <h2>Say hello.</h2>
+      <p class="lede">Questions about an order, a product, or a wholesale inquiry — we read everything that comes in.</p>
+      <div class="contact-detail">
+        <div>
+          <span>Email</span>
+          hello@kitchzen.example
+        </div>
+        <div>
+          <span>Studio</span>
+          Open Tue–Sat, 10am–5pm
+        </div>
+        <div>
+          <span>Response time</span>
+          Within 2 business days
+        </div>
+      </div>
+    </div>
+
+    <form id="contact-form">
+      <div class="form-row">
+        <label for="c-name">Name</label>
+        <input type="text" id="c-name" name="name" required>
+      </div>
+      <div class="form-row">
+        <label for="c-email">Email</label>
+        <input type="email" id="c-email" name="email" required>
+      </div>
+      <div class="form-row">
+        <label for="c-message">Message</label>
+        <textarea id="c-message" name="message" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Send message</button>
+      <p class="form-msg" id="contact-msg">Thanks — we'll write back within 2 business days.</p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderHeader("About");
+  renderFooter();
+
+  document.getElementById("contact-form").addEventListener("submit", e => {
+    e.preventDefault();
+    document.getElementById("contact-msg").classList.add("show");
+    showToast("Message sent — thank you.");
+    e.target.reset();
+  });
+</script>
+</body>
+</html>

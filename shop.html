@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shop — Kitchzen</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<section class="section-tight">
+  <div class="wrap">
+    <p class="eyebrow">Shop</p>
+    <h1 style="font-size:44px; margin:10px 0 6px;">The full collection</h1>
+    <p class="lede">Every piece we make, in one place.</p>
+  </div>
+</section>
+
+<section class="section-tight" style="padding-top:0;">
+  <div class="wrap">
+    <div class="shop-toolbar">
+      <div class="chip-row" id="chip-row"></div>
+      <div style="display:flex; align-items:center; gap:18px;">
+        <span class="result-count" id="result-count"></span>
+        <select class="sort-select" id="sort-select">
+          <option value="featured">Sort: Featured</option>
+          <option value="price-asc">Price: Low to high</option>
+          <option value="price-desc">Price: High to low</option>
+          <option value="name-asc">Name: A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="product-grid" id="shop-grid"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderHeader("Shop");
+  renderFooter();
+
+  const params = new URLSearchParams(location.search);
+  let activeCat = params.get("cat") || "All";
+  let sortMode = "featured";
+
+  const cats = ["All", "Cookware", "Utensils", "Storage", "Appliances"];
+
+  function renderChips(){
+    document.getElementById("chip-row").innerHTML = cats.map(c => `
+      <button class="chip ${c === activeCat ? 'active' : ''}" data-cat="${c}">${c}</button>
+    `).join("");
+    document.querySelectorAll("[data-cat]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeCat = btn.getAttribute("data-cat");
+        renderChips();
+        renderGrid();
+      });
+    });
+  }
+
+  function renderGrid(){
+    let list = activeCat === "All" ? [...PRODUCTS] : PRODUCTS.filter(p => p.category === activeCat);
+
+    if(sortMode === "price-asc") list.sort((a,b) => a.price - b.price);
+    else if(sortMode === "price-desc") list.sort((a,b) => b.price - a.price);
+    else if(sortMode === "name-asc") list.sort((a,b) => a.name.localeCompare(b.name));
+
+    document.getElementById("result-count").textContent = `${list.length} product${list.length === 1 ? "" : "s"}`;
+
+    document.getElementById("shop-grid").innerHTML = list.map(p => `
+      <div class="product-card">
+        <a href="product.html?id=${p.id}">
+          <div class="product-media">
+            ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ""}
+            <div class="ring"></div>
+            ${p.icon}
+          </div>
+        </a>
+        <div class="product-body">
+          <span class="product-cat">${p.category}</span>
+          <a href="product.html?id=${p.id}"><h3 class="product-name">${p.name}</h3></a>
+          <div class="product-row">
+            <span class="product-price">${fmt(p.price)}</span>
+            <button class="add-btn" data-add="${p.id}" aria-label="Add ${p.name} to cart">${ICONS.plus}</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+
+    document.querySelectorAll("[data-add]").forEach(btn => {
+      btn.addEventListener("click", e => {
+        e.preventDefault();
+        const id = btn.getAttribute("data-add");
+        addToCart(id, 1);
+        showToast(`Added ${getProduct(id).name} to cart`);
+      });
+    });
+  }
+
+  document.getElementById("sort-select").addEventListener("change", e => {
+    sortMode = e.target.value;
+    renderGrid();
+  });
+
+  renderChips();
+  renderGrid();
+</script>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kitchzen — Kitchen tools for a calmer counter</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <p class="hero-eyebrow eyebrow">The zen counter</p>
+      <h1>Kitchen tools that<br>let the room go <em>quiet.</em></h1>
+      <p class="lede">Kitchzen makes the cookware, utensils, storage, and small appliances behind an uncluttered kitchen — built to last, not to shout.</p>
+      <div class="hero-cta-row">
+        <a href="shop.html" class="btn btn-primary">Shop the collection</a>
+        <a href="about.html" class="btn btn-outline">Our approach</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-plate">
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        <div class="ripple-ring"></div>
+        <svg viewBox="0 0 100 100" fill="none" stroke="#23261F" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 46 h56 a2 2 0 0 1 2 2 v6 c0 14 -13 24 -30 24 s-30 -10 -30 -24 v-6 a2 2 0 0 1 2 -2z"/>
+          <rect x="30" y="38" width="40" height="8" rx="2"/>
+          <circle cx="50" cy="32" r="3"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FEATURED PRODUCTS ===================== -->
+<section class="section" id="featured">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Featured</p>
+        <h2>This week on the counter</h2>
+      </div>
+      <a href="shop.html" class="btn btn-outline">View all products</a>
+    </div>
+    <div class="product-grid" id="featured-grid"></div>
+  </div>
+</section>
+
+<div class="wrap"><div class="divider-ripple"><span></span><span></span><span></span></div></div>
+
+<!-- ===================== CATEGORIES ===================== -->
+<section class="section">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Browse</p>
+        <h2>Shop by category</h2>
+      </div>
+    </div>
+    <div class="cat-grid" id="cat-grid"></div>
+  </div>
+</section>
+
+<!-- ===================== NEWSLETTER ===================== -->
+<section class="newsletter">
+  <div class="wrap">
+    <div>
+      <h2>A quieter inbox for a calmer kitchen.</h2>
+      <p>One email a month. New arrivals, restocks, and the occasional recipe.</p>
+    </div>
+    <form class="nl-form">
+      <input type="email" placeholder="you@email.com" required>
+      <button type="submit" class="btn btn-brass">Subscribe</button>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderHeader("Home");
+  renderFooter();
+
+  const featured = PRODUCTS.slice(0, 4);
+  document.getElementById("featured-grid").innerHTML = featured.map(p => `
+    <div class="product-card">
+      <a href="product.html?id=${p.id}">
+        <div class="product-media">
+          ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ""}
+          <div class="ring"></div>
+          ${p.icon}
+        </div>
+      </a>
+      <div class="product-body">
+        <span class="product-cat">${p.category}</span>
+        <a href="product.html?id=${p.id}"><h3 class="product-name">${p.name}</h3></a>
+        <div class="product-row">
+          <span class="product-price">${fmt(p.price)}</span>
+          <button class="add-btn" data-add="${p.id}" aria-label="Add ${p.name} to cart">${ICONS.plus}</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  const cats = ["Cookware", "Utensils", "Storage", "Appliances"];
+  document.getElementById("cat-grid").innerHTML = cats.map(c => {
+    const count = PRODUCTS.filter(p => p.category === c).length;
+    return `
+      <a href="shop.html?cat=${c}" class="cat-card">
+        <span class="cat-icon">${CATEGORY_ICON[c]}</span>
+        <div>
+          <h3>${c}</h3>
+          <span class="cat-count">${count} pieces</span>
+        </div>
+        <span class="cat-arrow">${ICONS.arrow}</span>
+      </a>`;
+  }).join("");
+
+  document.querySelectorAll("[data-add]").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const id = btn.getAttribute("data-add");
+      addToCart(id, 1);
+      showToast(`Added ${getProduct(id).name} to cart`);
+    });
+  });
+</script>
+</body>
+</html>

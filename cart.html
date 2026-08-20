@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your cart — Kitchzen</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<section class="section">
+  <div class="wrap">
+    <p class="eyebrow">Cart</p>
+    <h1 style="font-size:40px; margin:10px 0 40px;">Your cart</h1>
+    <div id="cart-mount"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderHeader("Shop");
+  renderFooter();
+
+  function renderCart(){
+    const lines = cartLinesWithProducts();
+    const mount = document.getElementById("cart-mount");
+
+    if(lines.length === 0){
+      mount.innerHTML = `
+        <div class="empty-state">
+          <span class="ripple-icon">${ICONS.ripple}</span>
+          <h2 style="font-size:24px; margin-bottom:10px;">Your cart is still and empty.</h2>
+          <p class="lede" style="margin:0 auto 28px;">Drop something in — a skillet, a spatula, whatever the counter's missing.</p>
+          <a href="shop.html" class="btn btn-primary">Browse the shop</a>
+        </div>`;
+      return;
+    }
+
+    const subtotal = cartSubtotal();
+    const shipping = subtotal >= 75 ? 0 : 8;
+    const total = subtotal + shipping;
+
+    mount.innerHTML = `
+      <div class="cart-layout">
+        <div class="cart-list">
+          ${lines.map(l => `
+            <div class="cart-row" data-row="${l.id}">
+              <div class="cart-thumb">${l.product.icon}</div>
+              <div>
+                <div class="cart-item-name">${l.product.name}</div>
+                <div class="cart-item-cat">${l.product.category}</div>
+              </div>
+              <div class="qty-stepper" style="height:38px;">
+                <button type="button" data-dec="${l.id}" aria-label="Decrease quantity">−</button>
+                <input type="text" value="${l.qty}" data-qty-input="${l.id}" inputmode="numeric" aria-label="Quantity" style="width:32px;">
+                <button type="button" data-inc="${l.id}" aria-label="Increase quantity">+</button>
+              </div>
+              <span class="cart-price">${fmt(l.product.price * l.qty)}</span>
+              <button class="remove-btn" data-remove="${l.id}">Remove</button>
+            </div>
+          `).join("")}
+        </div>
+
+        <div class="summary-card">
+          <h3>Order summary</h3>
+          <div class="summary-row"><span>Subtotal</span><span>${fmt(subtotal)}</span></div>
+          <div class="summary-row"><span>Shipping</span><span>${shipping === 0 ? "Free" : fmt(shipping)}</span></div>
+          ${shipping > 0 ? `<div class="summary-row" style="font-size:12px;">Free shipping over $75</div>` : ""}
+          <div class="summary-row total"><span>Total</span><span>${fmt(total)}</span></div>
+          <button class="btn btn-primary btn-full" id="checkout-btn" style="margin-top:20px;">Checkout</button>
+          <p class="form-msg" id="checkout-msg">This is a demo — no payment is taken.</p>
+        </div>
+      </div>
+    `;
+
+    lines.forEach(l => {
+      document.querySelector(`[data-inc="${l.id}"]`).addEventListener("click", () => {
+        setQty(l.id, l.qty + 1); renderCart();
+      });
+      document.querySelector(`[data-dec="${l.id}"]`).addEventListener("click", () => {
+        setQty(l.id, Math.max(1, l.qty - 1)); renderCart();
+      });
+      document.querySelector(`[data-qty-input="${l.id}"]`).addEventListener("change", e => {
+        setQty(l.id, Math.max(1, parseInt(e.target.value) || 1)); renderCart();
+      });
+      document.querySelector(`[data-remove="${l.id}"]`).addEventListener("click", () => {
+        removeFromCart(l.id); showToast(`Removed ${l.product.name}`); renderCart();
+      });
+    });
+
+    document.getElementById("checkout-btn").addEventListener("click", () => {
+      const msg = document.getElementById("checkout-msg");
+      msg.classList.add("show");
+    });
+  }
+
+  renderCart();
+</script>
+</body>
+</html>

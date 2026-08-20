@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product — Kitchzen</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="site-header" id="site-header"></header>
+
+<section class="section" id="pd-mount"></section>
+
+<section class="section-tight" style="border-top:1px solid var(--line);">
+  <div class="wrap">
+    <p class="eyebrow">You might also like</p>
+    <div class="product-grid" id="related-grid" style="margin-top:26px;"></div>
+  </div>
+</section>
+
+<footer class="site-footer" id="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderHeader("Shop");
+  renderFooter();
+
+  const id = new URLSearchParams(location.search).get("id");
+  const product = getProduct(id) || PRODUCTS[0];
+  document.title = `${product.name} — Kitchzen`;
+
+  document.getElementById("pd-mount").innerHTML = `
+    <div class="wrap pd-grid">
+      <div class="pd-media">
+        ${product.icon}
+      </div>
+      <div>
+        <span class="pd-cat">${product.category}</span>
+        <h1 class="pd-name">${product.name}</h1>
+        <div class="pd-price">${fmt(product.price)}</div>
+        <p class="pd-desc">${product.desc}</p>
+
+        <div class="qty-row">
+          <div class="qty-stepper">
+            <button type="button" id="qty-dec" aria-label="Decrease quantity">−</button>
+            <input type="text" id="qty-input" value="1" inputmode="numeric" aria-label="Quantity">
+            <button type="button" id="qty-inc" aria-label="Increase quantity">+</button>
+          </div>
+          <button class="btn btn-primary" id="pd-add">Add to cart</button>
+        </div>
+        <p class="pd-added-msg" id="pd-msg">Added to your cart.</p>
+
+        <div class="pd-meta">
+          ${product.detail.map(d => {
+            const [k, v] = d.split(":");
+            return `<div><span>${k}</span>${v || ""}</div>`;
+          }).join("")}
+        </div>
+
+        <a href="shop.html" class="btn btn-outline">← Back to shop</a>
+      </div>
+    </div>
+  `;
+
+  let qty = 1;
+  const qtyInput = document.getElementById("qty-input");
+  document.getElementById("qty-dec").addEventListener("click", () => {
+    qty = Math.max(1, qty - 1); qtyInput.value = qty;
+  });
+  document.getElementById("qty-inc").addEventListener("click", () => {
+    qty = qty + 1; qtyInput.value = qty;
+  });
+  qtyInput.addEventListener("change", () => {
+    qty = Math.max(1, parseInt(qtyInput.value) || 1); qtyInput.value = qty;
+  });
+  document.getElementById("pd-add").addEventListener("click", () => {
+    addToCart(product.id, qty);
+    showToast(`Added ${qty} × ${product.name} to cart`);
+    const msg = document.getElementById("pd-msg");
+    msg.classList.add("show");
+    setTimeout(() => msg.classList.remove("show"), 2200);
+  });
+
+  const related = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  const fallback = related.length ? related : PRODUCTS.filter(p => p.id !== product.id).slice(0, 4);
+  document.getElementById("related-grid").innerHTML = fallback.map(p => `
+    <div class="product-card">
+      <a href="product.html?id=${p.id}">
+        <div class="product-media">
+          ${p.tag ? `<span class="product-tag">${p.tag}</span>` : ""}
+          <div class="ring"></div>
+          ${p.icon}
+        </div>
+      </a>
+      <div class="product-body">
+        <span class="product-cat">${p.category}</span>
+        <a href="product.html?id=${p.id}"><h3 class="product-name">${p.name}</h3></a>
+        <div class="product-row">
+          <span class="product-price">${fmt(p.price)}</span>
+          <button class="add-btn" data-add="${p.id}" aria-label="Add ${p.name} to cart">${ICONS.plus}</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  document.querySelectorAll("[data-add]").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.preventDefault();
+      const pid = btn.getAttribute("data-add");
+      addToCart(pid, 1);
+      showToast(`Added ${getProduct(pid).name} to cart`);
+    });
+  });
+</script>
+</body>
+</html>
